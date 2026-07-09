@@ -41,7 +41,7 @@ textarea{min-height:180px}
 </head>
 <body>
 <h1>埃及方言学习 App</h1>
-<div class="muted">C1 冲高级版 · 8 个大分类 · 加词自动保存 · 可备份</div>
+<div class="muted">C1 冲高级版 · 8 个大分类 · 防重复 · 加词自动保存 · 可备份</div>
 <div>
   <span class="badge">分类：<b id="currentCat">全部</b></span>
   <span class="badge">词数：<b id="count">0</b></span>
@@ -117,7 +117,7 @@ textarea{min-height:180px}
 
 <div class="panel" style="margin-left:0;margin-right:0">
 <h2>系统</h2>
-<div class="row"><button class="hot" onclick="resetBase()">恢复内置词库</button><button class="red" onclick="factoryReset()">全部重置</button></div>
+<div class="row"><button class="hot" onclick="resetBase()">恢复内置词库</button><button class="purple" onclick="removeDuplicates()">整理重复词</button><button class="red" onclick="factoryReset()">全部重置</button></div>
 <p class="small">上传到 GitHub Pages 后，用 Safari 打开网址，再点“分享 → 添加到主屏幕”。</p>
 </div>
 
@@ -172,8 +172,24 @@ function render(){renderCats();renderSelects();const f=filtered();$("currentCat"
 function tab(x){["study","match","quiz","manage"].forEach(y=>{$(y).classList.toggle("hidden",y!==x);$("b"+y[0].toUpperCase()+y.slice(1)).classList.toggle("on",y===x)});if(x==="match")newMatch();if(x==="quiz")newQuiz()}
 function flip(){if(!filtered().length)return;showing=!showing;$("front").classList.toggle("hidden",showing);$("back").classList.toggle("hidden",!showing)}
 function next(){const f=filtered();if(f.length){i=(i+1)%f.length;render()}} function prev(){const f=filtered();if(f.length){i=(i-1+f.length)%f.length;render()}}
-function addOne(){let front=$("oneFront").value.trim(),back=$("oneBack").value.trim(),cat=($("singleCatNew").value.trim()||$("singleCat").value.trim()||"中级词汇");if(!front||!back){msg("阿语和中文都要填");return}cards.push({cat,front,back,base:false});$("oneFront").value="";$("oneBack").value="";$("singleCatNew").value="";current=cat;save()}
-function importBulk(){let text=$("bulk").value.trim();if(!text){msg("先粘贴内容");return}let defaultCat=($("bulkCatNew").value.trim()||$("bulkCat").value||"中级词汇");let n=0;text.split(/\n+/).forEach(line=>{line=line.trim();if(!line)return;let p=line.split("|").map(x=>x.trim()).filter(Boolean);if(p.length>=3){cards.push({cat:p[0],front:p[1],back:p[2],base:false});n++}else if(p.length>=2){cards.push({cat:defaultCat,front:p[0],back:p[1],base:false});n++}});$("bulk").value="";$("bulkCatNew").value="";current=defaultCat;save();msg("已导入并保存 "+n+" 条")}
+
+function normWord(s){
+  return String(s||"")
+    .trim()
+    .replace(/[ًٌٍَُِّْـ]/g,"")
+    .replace(/\s+/g," ")
+    .toLowerCase();
+}
+function sameFront(a,b){
+  return normWord(a)===normWord(b);
+}
+function hasDuplicateFront(front){
+  const n=normWord(front);
+  return cards.some(c=>normWord(c.front)===n);
+}
+
+function addOne(){let front=$("oneFront").value.trim(),back=$("oneBack").value.trim(),cat=($("singleCatNew").value.trim()||$("singleCat").value.trim()||"中级词汇");if(!front||!back){msg("阿语和中文都要填");return}if(hasDuplicateFront(front)){msg("这个阿语已经有了，已跳过");return}cards.push({cat,front,back,base:false});$("oneFront").value="";$("oneBack").value="";$("singleCatNew").value="";current=cat;save()}
+function importBulk(){let text=$("bulk").value.trim();if(!text){msg("先粘贴内容");return}let defaultCat=($("bulkCatNew").value.trim()||$("bulkCat").value||"中级词汇");let n=0,skip=0;let seen=new Set(cards.map(c=>normWord(c.front)));text.split(/\n+/).forEach(line=>{line=line.trim();if(!line)return;let p=line.split("|").map(x=>x.trim()).filter(Boolean);let cat,front,back;if(p.length>=3){cat=p[0];front=p[1];back=p[2]}else if(p.length>=2){cat=defaultCat;front=p[0];back=p[1]}else{return}let key=normWord(front);if(seen.has(key)){skip++;return}seen.add(key);cards.push({cat,front,back,base:false});n++});$("bulk").value="";$("bulkCatNew").value="";current=defaultCat;save();msg("已导入 "+n+" 条，跳过重复 "+skip+" 条")}
 function clearCustom(){cards=cards.filter(c=>c.base);current='全部';save();msg("已清空自己添加的词")}
 function resetBase(){const custom=cards.filter(c=>!c.base);cards=[...DEFAULT,...custom];current='全部';save();msg("已恢复内置词库")}
 function factoryReset(){cards=[...DEFAULT];current='全部';save();msg("已全部重置")}
@@ -182,6 +198,21 @@ function restoreBackup(){try{const data=JSON.parse($("backupBox").value);if(!Arr
 function renderCatManage(){const s=$("catManage");if(!s)return;const cats=categories().filter(c=>c!=="全部");s.innerHTML=cats.map(c=>`<option>${esc(c)}</option>`).join("")}
 function renameCat(){const oldCat=$("catManage").value;const newCat=$("catRenameTo").value.trim();if(!oldCat||!newCat){msg("先选分类，再写新名字");return}cards.forEach(c=>{if(c.cat===oldCat)c.cat=newCat});if(current===oldCat)current=newCat;$("catRenameTo").value="";save();msg("分类已改名")}
 function deleteCatWords(){const cat=$("catManage").value;if(!cat){msg("先选分类");return}cards=cards.filter(c=>c.cat!==cat);if(current===cat)current="全部";save();msg("已删除这个分类的词")}
+
+function removeDuplicates(){
+  const seen=new Set();
+  let kept=[], removed=0;
+  cards.forEach(c=>{
+    const key=normWord(c.front);
+    if(seen.has(key)){removed++}
+    else{seen.add(key);kept.push(c)}
+  });
+  cards=kept;
+  if(i>=filtered().length)i=0;
+  save();
+  msg("已整理，删除重复 "+removed+" 条");
+}
+
 function renderList(){const f=filtered(),box=$("list");if(!f.length){box.innerHTML='<div class="item muted">没有词。</div>';return}box.innerHTML=f.map((c,idx)=>`<div class="item"><div class="a">${esc(c.front)}</div><div class="c">${esc(c.back)}</div><div class="cat">分类：${esc(c.cat)}${c.base?' · 内置':' · 自己添加'}</div><button class="red" onclick="delShown(${idx})">删除这一条</button></div>`).join("")}
 function delShown(n){const target=filtered()[n];const pos=cards.indexOf(target);if(pos>=0)cards.splice(pos,1);if(i>=filtered().length)i=0;save()}
 function newMatch(){selected=null;score=0;$("score").textContent=0;let g=$("matchGrid"),f=filtered();if(f.length<2){g.innerHTML='<p class="muted">至少需要2个词。</p>';return}let subset=[...f].sort(()=>Math.random()-.5).slice(0,Math.min(5,f.length));let tiles=[];subset.forEach((c,n)=>{tiles.push({id:n,type:"a",txt:c.front});tiles.push({id:n,type:"c",txt:c.back})});tiles.sort(()=>Math.random()-.5);g.innerHTML=tiles.map(t=>`<div class="tile ${t.type==='a'?'arabic':''}" data-id="${t.id}" data-type="${t.type}" onclick="tap(this)">${esc(t.txt)}</div>`).join("")}
