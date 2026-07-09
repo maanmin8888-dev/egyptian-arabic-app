@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="埃及方言">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#ff8a1f">
+<title>埃及方言学习</title>
+<style>
+:root{--bg:#081022;--panel:#151b32;--tile:#0d1429;--line:#354060;--text:#f8fafc;--muted:#aeb8cc;--orange:#ff8a1f;--blue:#4f7cff;--red:#b83b54;--green:#2dd47a;--purple:#6d5dfc}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;padding:calc(14px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#071023,#101831);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+h1{font-size:28px;margin:8px 0 6px} h2{font-size:23px;margin:10px 0}
+.muted{color:var(--muted);font-size:15px;line-height:1.55}
+.badge{display:inline-block;background:#0f1731;border:1px solid var(--line);border-radius:999px;padding:8px 12px;margin:4px 4px 4px 0;font-size:15px}
+nav{position:sticky;top:0;z-index:9;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px -4px;padding:8px 4px;background:rgba(8,16,34,.95);backdrop-filter:blur(10px)}
+button{border:0;border-radius:16px;padding:14px 8px;min-height:50px;background:#242d4d;color:white;font-weight:850;font-size:17px}
+button.on,button.hot{background:var(--orange);color:#111} button.blue{background:var(--blue)} button.red{background:var(--red)} button.purple{background:var(--purple)}
+.panel{background:rgba(21,27,50,.96);border:1px solid var(--line);border-radius:22px;padding:16px;margin:14px 0}
+.hidden{display:none!important}
+.card{min-height:330px;background:#0f1731;border:1px solid var(--line);border-radius:26px;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;margin:14px 0}
+.ar{font-size:48px;direction:rtl;line-height:1.45;font-weight:900;white-space:normal;overflow-wrap:break-word}
+.cn{font-size:38px;font-weight:900;line-height:1.45;white-space:normal}
+.row{display:flex;gap:10px} .row button{flex:1}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+.tile{min-height:92px;background:var(--tile);border:1px solid var(--line);border-radius:20px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-weight:900;font-size:28px;line-height:1.35;white-space:normal;overflow-wrap:break-word}
+.tile.arabic{direction:rtl;font-size:34px;line-height:1.45} .tile.sel{outline:4px solid var(--orange)} .tile.done{opacity:.18;transform:scale(.99)}
+.choice{width:100%;margin:9px 0;min-height:70px;font-size:24px;line-height:1.35}
+textarea,input,select{width:100%;box-sizing:border-box;background:#0d1429;color:white;border:1px solid var(--line);border-radius:16px;padding:14px;font-size:18px;margin:6px 0 10px}
+textarea{min-height:180px}
+.item{border-bottom:1px solid var(--line);padding:14px} .item:last-child{border-bottom:0}
+.item .a{direction:rtl;font-size:30px;line-height:1.45;font-weight:900;text-align:right;overflow-wrap:break-word}
+.item .c{font-size:22px;color:#e6ebf8;margin-top:6px} .item .cat{color:var(--muted);font-size:14px;margin-top:4px}
+#msg{color:var(--green);min-height:22px;margin-top:4px}
+.catbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0} .catbar button{min-height:42px;padding:10px 12px;font-size:15px;border-radius:999px}
+.small{font-size:13px;color:var(--muted)}
+@media (min-width:700px){body{max-width:760px;margin:0 auto}.grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<h1>埃及方言学习 App</h1>
+<div class="muted">单文件版 · 只上传 index.html · 加词自动保存 · 可备份</div>
+<div>
+  <span class="badge">分类：<b id="currentCat">全部</b></span>
+  <span class="badge">词数：<b id="count">0</b></span>
+  <span class="badge">保存：<b id="saveStatus">正常</b></span>
+  <span class="badge" id="msg"></span>
+</div>
+<div class="catbar" id="catButtons"></div>
+
+<nav>
+<button id="bStudy" class="on" onclick="tab('study')">背词</button>
+<button id="bMatch" onclick="tab('match')">配对</button>
+<button id="bQuiz" onclick="tab('quiz')">选择</button>
+<button id="bManage" onclick="tab('manage')">管理</button>
+</nav>
+
+<section id="study" class="panel">
+<div><span class="badge">第 <b id="idx">1</b> / <b id="total">0</b></span></div>
+<div class="card" onclick="flip()"><div><div id="front" class="ar"></div><div id="back" class="cn hidden"></div><div class="muted" style="margin-top:16px">点卡片看答案</div></div></div>
+<div class="row"><button onclick="prev()">上一个</button><button class="hot" onclick="flip()">看答案</button><button onclick="next()">下一个</button></div>
+</section>
+
+<section id="match" class="panel hidden">
+<div><span class="badge">配对得分：<b id="score">0</b></span></div>
+<p class="muted">点一个阿语，再点对应中文。正确会变淡。</p>
+<button class="blue" style="width:100%" onclick="newMatch()">换一组</button>
+<div id="matchGrid" class="grid" style="margin-top:14px"></div>
+</section>
+
+<section id="quiz" class="panel hidden">
+<div><span class="badge">正确：<b id="good">0</b> / <b id="qtotal">0</b></span></div>
+<div class="card" style="min-height:210px"><div id="q" class="ar">点下一题</div></div>
+<div id="opts"></div>
+<button class="blue" style="width:100%;margin-top:10px" onclick="newQuiz()">下一题</button>
+</section>
+
+<section id="manage" class="panel hidden">
+<h2>添加新词</h2>
+<p class="muted">单个添加：填阿语和中文，选分类，然后点添加。会自动保存。</p>
+<select id="singleCat"><option>我的新词</option><option>旅行</option><option>仓库</option><option>工厂</option><option>餐厅</option><option>日常</option><option>句子</option></select>
+<input id="oneFront" dir="rtl" placeholder="阿语，例如：باب">
+<input id="oneBack" placeholder="中文，例如：门">
+<button class="hot" style="width:100%" onclick="addOne()">添加一个并保存</button>
+
+<div class="panel" style="margin-left:0;margin-right:0">
+<h2>批量导入</h2>
+<p class="muted">格式一：阿语|中文。格式二：分类|阿语|中文。每行一个。</p>
+<select id="bulkCat"><option>我的新词</option><option>旅行</option><option>仓库</option><option>工厂</option><option>餐厅</option><option>日常</option><option>句子</option></select>
+<textarea id="bulk" placeholder="باب|门
+مفتاح|钥匙
+
+或者：
+工厂|عامل|工人
+餐厅|معلقة|勺子"></textarea>
+<div class="row"><button class="blue" onclick="importBulk()">批量导入并保存</button><button class="red" onclick="clearCustom()">清空自己添加</button></div>
+</div>
+
+<div class="panel" style="margin-left:0;margin-right:0">
+<h2>备份 / 恢复</h2>
+<p class="muted">重要：加了很多词以后，点“生成备份”，复制下面内容保存到备忘录。换手机或记录丢了，可以粘贴回来恢复。</p>
+<div class="row"><button class="purple" onclick="makeBackup()">生成备份</button><button class="blue" onclick="restoreBackup()">恢复备份</button></div>
+<textarea id="backupBox" placeholder="备份内容会出现在这里"></textarea>
+</div>
+
+<div class="panel" style="margin-left:0;margin-right:0">
+<h2>系统</h2>
+<div class="row"><button class="hot" onclick="resetBase()">恢复内置词库</button><button class="red" onclick="factoryReset()">全部重置</button></div>
+<p class="small">上传到 GitHub Pages 后，用 Safari 打开网址，再点“分享 → 添加到主屏幕”。</p>
+</div>
+
+<h2>当前词库</h2>
+<div id="list" class="panel" style="padding:0"></div>
+</section>
+
+<script>
+const DEFAULT = [{"cat": "旅行", "front": "المطار", "back": "机场", "base": true}, {"cat": "旅行", "front": "محطة القطار", "back": "火车站", "base": true}, {"cat": "旅行", "front": "محطة القطار السريع", "back": "高铁站", "base": true}, {"cat": "旅行", "front": "محطة المترو", "back": "地铁站", "base": true}, {"cat": "旅行", "front": "موقف الأتوبيس", "back": "公交站", "base": true}, {"cat": "旅行", "front": "المخرج", "back": "出口", "base": true}, {"cat": "旅行", "front": "المدخل", "back": "入口", "base": true}, {"cat": "旅行", "front": "شباك التذاكر", "back": "售票处", "base": true}, {"cat": "旅行", "front": "صالة انتظار", "back": "候车室", "base": true}, {"cat": "旅行", "front": "نقطة التفتيش الأمني", "back": "安检", "base": true}, {"cat": "旅行", "front": "بوابة الصعود للطائرة", "back": "登机口", "base": true}, {"cat": "旅行", "front": "تذكرة طيران", "back": "机票", "base": true}, {"cat": "旅行", "front": "تذكرة مواصلات", "back": "车票", "base": true}, {"cat": "旅行", "front": "تذكرة ذهاب فقط", "back": "单程票", "base": true}, {"cat": "旅行", "front": "تذكرة ذهاب وعودة", "back": "往返票", "base": true}, {"cat": "旅行", "front": "جواز سفر", "back": "护照", "base": true}, {"cat": "旅行", "front": "فيزا", "back": "签证", "base": true}, {"cat": "旅行", "front": "بطاقة شخصية", "back": "身份证", "base": true}, {"cat": "旅行", "front": "أمتعة", "back": "行李", "base": true}, {"cat": "旅行", "front": "شنطة سفر", "back": "行李箱", "base": true}, {"cat": "旅行", "front": "شحن الأمتعة", "back": "托运", "base": true}, {"cat": "旅行", "front": "حقيبة يد", "back": "随身行李", "base": true}, {"cat": "旅行", "front": "حفظ الأمتعة", "back": "行李寄存", "base": true}, {"cat": "旅行", "front": "وزن زائد", "back": "超重", "base": true}, {"cat": "旅行", "front": "طيارة", "back": "飞机", "base": true}, {"cat": "旅行", "front": "قطر", "back": "火车", "base": true}, {"cat": "旅行", "front": "قطار سريع", "back": "高铁", "base": true}, {"cat": "旅行", "front": "مترو", "back": "地铁", "base": true}, {"cat": "旅行", "front": "أتوبيس", "back": "公交车", "base": true}, {"cat": "旅行", "front": "تاكسي", "back": "出租车", "base": true}, {"cat": "旅行", "front": "مركب", "back": "船", "base": true}, {"cat": "旅行", "front": "فندق", "back": "酒店", "base": true}, {"cat": "旅行", "front": "استراحة", "back": "旅馆", "base": true}, {"cat": "旅行", "front": "الاستقبال", "back": "前台", "base": true}, {"cat": "旅行", "front": "غرفة", "back": "房间", "base": true}, {"cat": "旅行", "front": "تسجيل الخروج", "back": "退房", "base": true}, {"cat": "旅行", "front": "تسجيل الدخول", "back": "入住", "base": true}, {"cat": "旅行", "front": "مطعم", "back": "餐厅", "base": true}, {"cat": "旅行", "front": "المنيو", "back": "菜单", "base": true}, {"cat": "旅行", "front": "جرسون", "back": "服务员", "base": true}, {"cat": "旅行", "front": "طلب أكل", "back": "点菜", "base": true}, {"cat": "旅行", "front": "الحساب", "back": "买单", "base": true}, {"cat": "旅行", "front": "على اليسار", "back": "左边", "base": true}, {"cat": "旅行", "front": "على اليمين", "back": "右边", "base": true}, {"cat": "旅行", "front": "قدام", "back": "前面", "base": true}, {"cat": "旅行", "front": "ورا", "back": "后面", "base": true}, {"cat": "旅行", "front": "هنا", "back": "这里", "base": true}, {"cat": "旅行", "front": "هناك", "back": "那里", "base": true}, {"cat": "旅行", "front": "بكام؟", "back": "多少钱", "base": true}, {"cat": "旅行", "front": "غالي جدًا", "back": "太贵了", "base": true}, {"cat": "旅行", "front": "ممكن تخفض السعر شوية؟", "back": "可以便宜一点吗", "base": true}, {"cat": "旅行", "front": "أنا مش فاهم", "back": "我听不懂", "base": true}, {"cat": "旅行", "front": "قولها تاني لو سمحت", "back": "请再说一遍", "base": true}, {"cat": "旅行", "front": "ممكن أسأل؟", "back": "请问", "base": true}, {"cat": "旅行", "front": "شكرًا", "back": "谢谢", "base": true}, {"cat": "旅行", "front": "العفو", "back": "不客气", "base": true}, {"cat": "旅行", "front": "معلش", "back": "对不起", "base": true}, {"cat": "旅行", "front": "مفيش مشكلة", "back": "没关系", "base": true}, {"cat": "旅行", "front": "شرطة", "back": "警察", "base": true}, {"cat": "旅行", "front": "مستشفى", "back": "医院", "base": true}, {"cat": "旅行", "front": "صيدلية", "back": "药店", "base": true}, {"cat": "旅行", "front": "النجدة!", "back": "救命", "base": true}, {"cat": "旅行", "front": "أنا تايه", "back": "迷路了", "base": true}, {"cat": "旅行", "front": "ضاع مني", "back": "丢了", "base": true}, {"cat": "旅行", "front": "موبايل", "back": "手机", "base": true}, {"cat": "旅行", "front": "خريطة", "back": "地图", "base": true}, {"cat": "仓库", "front": "مخزن", "back": "仓库", "base": true}, {"cat": "仓库", "front": "أمين مخزن", "back": "仓管员", "base": true}, {"cat": "仓库", "front": "مخزون", "back": "库存", "base": true}, {"cat": "仓库", "front": "كمية المخزون", "back": "库存数量", "base": true}, {"cat": "仓库", "front": "مخزون أمان", "back": "安全库存", "base": true}, {"cat": "仓库", "front": "خامات", "back": "原材料", "base": true}, {"cat": "仓库", "front": "نصف مصنع", "back": "半成品", "base": true}, {"cat": "仓库", "front": "منتج تام", "back": "成品", "base": true}, {"cat": "仓库", "front": "مواد", "back": "物料", "base": true}, {"cat": "仓库", "front": "مكونات", "back": "零件", "base": true}, {"cat": "仓库", "front": "مواد تغليف", "back": "包装材料", "base": true}, {"cat": "仓库", "front": "إدخال مخزن", "back": "入库", "base": true}, {"cat": "仓库", "front": "صرف مخزن", "back": "出库", "base": true}, {"cat": "仓库", "front": "إذن إضافة", "back": "入库单", "base": true}, {"cat": "仓库", "front": "إذن صرف", "back": "出库单", "base": true}, {"cat": "仓库", "front": "استلام بضاعة", "back": "收货", "base": true}, {"cat": "仓库", "front": "شحن بضاعة", "back": "发货", "base": true}, {"cat": "仓库", "front": "فحص بضاعة", "back": "验货", "base": true}, {"cat": "仓库", "front": "جرد", "back": "盘点", "base": true}, {"cat": "仓库", "front": "كشف جرد", "back": "盘点表", "base": true}, {"cat": "仓库", "front": "مكان التخزين", "back": "库位", "base": true}, {"cat": "仓库", "front": "رف", "back": "货架", "base": true}, {"cat": "仓库", "front": "بالتة", "back": "托盘", "base": true}, {"cat": "仓库", "front": "كرتونة", "back": "纸箱", "base": true}, {"cat": "仓库", "front": "ملصق", "back": "标签", "base": true}, {"cat": "仓库", "front": "باركود", "back": "条码", "base": true}, {"cat": "仓库", "front": "مسح باركود", "back": "扫码", "base": true}, {"cat": "仓库", "front": "كمية", "back": "数量", "base": true}, {"cat": "仓库", "front": "وزن", "back": "重量", "base": true}, {"cat": "仓库", "front": "موديل", "back": "型号", "base": true}, {"cat": "仓库", "front": "دفعة", "back": "批次", "base": true}, {"cat": "仓库", "front": "رقم الدفعة", "back": "批号", "base": true}, {"cat": "仓库", "front": "تاريخ الصلاحية", "back": "保质期", "base": true}, {"cat": "仓库", "front": "نقص بضاعة", "back": "缺货", "base": true}, {"cat": "仓库", "front": "تزويد بضاعة", "back": "补货", "base": true}, {"cat": "仓库", "front": "مرتجع", "back": "退货", "base": true}, {"cat": "仓库", "front": "استبدال", "back": "换货", "base": true}, {"cat": "仓库", "front": "مخزون راكد", "back": "呆滞库存", "base": true}, {"cat": "仓库", "front": "منتج معيب", "back": "不良品", "base": true}, {"cat": "仓库", "front": "خردة", "back": "报废", "base": true}, {"cat": "仓库", "front": "المخزون غير كافي", "back": "库存不足", "base": true}, {"cat": "仓库", "front": "المخزون كافي", "back": "库存充足", "base": true}, {"cat": "仓库", "front": "نقص خامات", "back": "缺料", "base": true}, {"cat": "仓库", "front": "تجهيز خامات", "back": "备料", "base": true}, {"cat": "仓库", "front": "صرف خامات", "back": "领料", "base": true}, {"cat": "仓库", "front": "إرجاع خامات", "back": "退料", "base": true}, {"cat": "仓库", "front": "نقل وتحميل", "back": "搬运", "base": true}, {"cat": "仓库", "front": "فوركليفت", "back": "叉车", "base": true}];
+const STORE_KEY = "egypt_arabic_single_index_v1_cards";
+let cards=[], current='全部', i=0, showing=false, selected=null, score=0, good=0, qtotal=0;
+function $(id){return document.getElementById(id)}
+function msg(t){$("msg").textContent=t; setTimeout(()=>{$("msg").textContent=''},2200)}
+function load(){
+  try{ const saved=JSON.parse(localStorage.getItem(STORE_KEY)||"null"); if(Array.isArray(saved)&&saved.length){cards=saved;$("saveStatus").textContent="已保存"} else {cards=[...DEFAULT];save(false)} }
+  catch(e){cards=[...DEFAULT];$("saveStatus").textContent="新建"}
+  render();
+}
+function save(show=true){try{localStorage.setItem(STORE_KEY,JSON.stringify(cards));$("saveStatus").textContent="已保存";if(show)msg("已保存")}catch(e){$("saveStatus").textContent="保存失败";msg("保存失败，请生成备份")} render();}
+function filtered(){return current==='全部'?cards:cards.filter(c=>c.cat===current)}
+function categories(){const set=new Set(['全部','旅行','仓库','我的新词','工厂','餐厅','日常','句子']);cards.forEach(c=>set.add(c.cat||'我的新词'));return [...set]}
+function renderCats(){$("catButtons").innerHTML=categories().map(c=>`<button class="${c===current?'hot':''}" onclick="setCat('${escAttr(c)}')">${esc(c)}</button>`).join('')}
+function setCat(c){current=c;i=0;render()}
+function render(){renderCats();const f=filtered();$("currentCat").textContent=current;$("count").textContent=f.length;$("total").textContent=f.length;if(i>=f.length)i=0;showing=false;if(f.length){$("idx").textContent=i+1;$("front").textContent=f[i].front;$("back").textContent=f[i].back;$("front").classList.remove("hidden");$("back").classList.add("hidden")}else{$("idx").textContent=0;$("front").textContent="这个分类没有词";$("back").textContent=""}renderList()}
+function tab(x){["study","match","quiz","manage"].forEach(y=>{$(y).classList.toggle("hidden",y!==x);$("b"+y[0].toUpperCase()+y.slice(1)).classList.toggle("on",y===x)});if(x==="match")newMatch();if(x==="quiz")newQuiz()}
+function flip(){if(!filtered().length)return;showing=!showing;$("front").classList.toggle("hidden",showing);$("back").classList.toggle("hidden",!showing)}
+function next(){const f=filtered();if(f.length){i=(i+1)%f.length;render()}} function prev(){const f=filtered();if(f.length){i=(i-1+f.length)%f.length;render()}}
+function addOne(){let front=$("oneFront").value.trim(),back=$("oneBack").value.trim(),cat=$("singleCat").value.trim()||"我的新词";if(!front||!back){msg("阿语和中文都要填");return}cards.push({cat,front,back,base:false});$("oneFront").value="";$("oneBack").value="";current=cat;save()}
+function importBulk(){let text=$("bulk").value.trim();if(!text){msg("先粘贴内容");return}let defaultCat=$("bulkCat").value||"我的新词";let n=0;text.split(/\n+/).forEach(line=>{line=line.trim();if(!line)return;let p=line.split("|").map(x=>x.trim()).filter(Boolean);if(p.length>=3){cards.push({cat:p[0],front:p[1],back:p[2],base:false});n++}else if(p.length>=2){cards.push({cat:defaultCat,front:p[0],back:p[1],base:false});n++}});$("bulk").value="";current=defaultCat;save();msg("已导入并保存 "+n+" 条")}
+function clearCustom(){cards=cards.filter(c=>c.base);current='全部';save();msg("已清空自己添加的词")}
+function resetBase(){const custom=cards.filter(c=>!c.base);cards=[...DEFAULT,...custom];current='全部';save();msg("已恢复内置词库")}
+function factoryReset(){cards=[...DEFAULT];current='全部';save();msg("已全部重置")}
+function makeBackup(){$("backupBox").value=JSON.stringify(cards,null,2);try{navigator.clipboard.writeText($("backupBox").value)}catch(e){}msg("备份已生成，请复制保存")}
+function restoreBackup(){try{const data=JSON.parse($("backupBox").value);if(!Array.isArray(data))throw new Error("not array");cards=data.map(c=>({cat:c.cat||"我的新词",front:c.front||"",back:c.back||"",base:!!c.base})).filter(c=>c.front&&c.back);current='全部';save();msg("已恢复备份")}catch(e){msg("备份格式不对")}}
+function renderList(){const f=filtered(),box=$("list");if(!f.length){box.innerHTML='<div class="item muted">没有词。</div>';return}box.innerHTML=f.map((c,idx)=>`<div class="item"><div class="a">${esc(c.front)}</div><div class="c">${esc(c.back)}</div><div class="cat">分类：${esc(c.cat)}${c.base?' · 内置':' · 自己添加'}</div><button class="red" onclick="delShown(${idx})">删除这一条</button></div>`).join("")}
+function delShown(n){const target=filtered()[n];const pos=cards.indexOf(target);if(pos>=0)cards.splice(pos,1);if(i>=filtered().length)i=0;save()}
+function newMatch(){selected=null;score=0;$("score").textContent=0;let g=$("matchGrid"),f=filtered();if(f.length<2){g.innerHTML='<p class="muted">至少需要2个词。</p>';return}let subset=[...f].sort(()=>Math.random()-.5).slice(0,Math.min(5,f.length));let tiles=[];subset.forEach((c,n)=>{tiles.push({id:n,type:"a",txt:c.front});tiles.push({id:n,type:"c",txt:c.back})});tiles.sort(()=>Math.random()-.5);g.innerHTML=tiles.map(t=>`<div class="tile ${t.type==='a'?'arabic':''}" data-id="${t.id}" data-type="${t.type}" onclick="tap(this)">${esc(t.txt)}</div>`).join("")}
+function tap(el){if(el.classList.contains("done"))return;if(!selected){selected=el;el.classList.add("sel");return}if(selected===el){el.classList.remove("sel");selected=null;return}let ok=selected.dataset.id===el.dataset.id&&selected.dataset.type!==el.dataset.type;if(ok){selected.classList.add("done");el.classList.add("done");selected.classList.remove("sel");score++;$("score").textContent=score}else{el.classList.add("sel");setTimeout(()=>{el.classList.remove("sel");selected&&selected.classList.remove("sel")},300)}selected=null}
+function newQuiz(){const f=filtered();if(f.length<4){$("q").textContent="至少需要4个词";$("opts").innerHTML="";return}let c=f[Math.floor(Math.random()*f.length)];$("q").textContent=c.front;let opts=[c.back];while(opts.length<4){let x=f[Math.floor(Math.random()*f.length)].back;if(!opts.includes(x))opts.push(x)}opts.sort(()=>Math.random()-.5);$("opts").innerHTML=opts.map(o=>`<button class="choice" onclick="ans(this,'${enc(c.back)}')">${esc(o)}</button>`).join("")}
+function ans(btn,correct){qtotal++;let c=decodeURIComponent(correct);if(btn.textContent===c){good++;btn.style.background="#2dd47a";btn.style.color="#05160b"}else{btn.style.background="#b83b54"}$("good").textContent=good;$("qtotal").textContent=qtotal;setTimeout(newQuiz,700)}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function escAttr(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,"&quot;")}
+function enc(s){return encodeURIComponent(s)}
+load();
+</script>
+</body>
+</html>
