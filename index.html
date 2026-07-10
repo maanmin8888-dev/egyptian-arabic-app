@@ -41,7 +41,7 @@ textarea{min-height:180px}
 </head>
 <body>
 <h1>埃及方言学习 App</h1>
-<div class="muted">C1 冲高级版 · 8 个大分类 · 防重复 · 加词自动保存 · 可备份</div>
+<div class="muted">C1 冲高级版 · 两栏导入 · 防重复 · 加词自动保存 · 可备份</div>
 <div>
   <span class="badge">分类：<b id="currentCat">全部</b></span>
   <span class="badge">词数：<b id="count">0</b></span>
@@ -85,6 +85,26 @@ textarea{min-height:180px}
 <input id="oneFront" dir="rtl" placeholder="阿语，例如：باب">
 <input id="oneBack" placeholder="中文，例如：门">
 <button class="hot" style="width:100%" onclick="addOne()">添加一个并保存</button>
+
+
+<div class="panel" style="margin-left:0;margin-right:0">
+<h2>两栏导入｜不乱版</h2>
+<p class="muted">这个最稳：上面只粘贴阿拉伯语，下面只粘贴中文。第1行配第1行，第2行配第2行。不要加 |。</p>
+<select id="twoCat"></select>
+<input id="twoCatNew" placeholder="新分类名，可不填">
+<textarea id="arabicList" dir="rtl" placeholder="这里粘贴阿拉伯语，一行一个：
+الراتب
+الأجر
+الراتب الأساسي"></textarea>
+<textarea id="chineseList" dir="ltr" placeholder="这里粘贴中文，一行一个：
+薪资
+薪资
+基本工资"></textarea>
+<div class="row">
+<button class="blue" onclick="importTwoColumns()">两栏导入并保存</button>
+<button class="red" onclick="clearTwoColumns()">清空两栏</button>
+</div>
+</div>
 
 <div class="panel" style="margin-left:0;margin-right:0">
 <h2>批量导入</h2>
@@ -165,6 +185,7 @@ function renderSelects(){
   const opts=selectCategories().map(c=>`<option>${esc(c)}</option>`).join('');
   if($("singleCat"))$("singleCat").innerHTML=opts;
   if($("bulkCat"))$("bulkCat").innerHTML=opts;
+  if($("twoCat"))$("twoCat").innerHTML=opts;
 }
 function renderCats(){$("catButtons").innerHTML=categories().map(c=>`<button class="${c===current?'hot':''}" onclick="setCat('${escAttr(c)}')">${esc(c)}</button>`).join('')}
 function setCat(c){current=c;i=0;render()}
@@ -189,6 +210,41 @@ function hasDuplicateFront(front){
 }
 
 function addOne(){let front=$("oneFront").value.trim(),back=$("oneBack").value.trim(),cat=($("singleCatNew").value.trim()||$("singleCat").value.trim()||"中级词汇");if(!front||!back){msg("阿语和中文都要填");return}if(hasDuplicateFront(front)){msg("这个阿语已经有了，已跳过");return}cards.push({cat,front,back,base:false});$("oneFront").value="";$("oneBack").value="";$("singleCatNew").value="";current=cat;save()}
+
+function importTwoColumns(){
+  const arText=($("arabicList").value||"").trim();
+  const cnText=($("chineseList").value||"").trim();
+  if(!arText||!cnText){msg("阿语和中文两栏都要粘贴");return}
+  const ars=arText.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const cns=cnText.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const total=Math.min(ars.length,cns.length);
+  if(ars.length!==cns.length){msg("两栏行数不一样，只导入能配上的 "+total+" 条")}
+  let cat=($("twoCatNew").value.trim()||$("twoCat").value||"中级词汇");
+  let seen=new Set(cards.map(c=>normWord(c.front)));
+  let n=0,skip=0;
+  for(let idx=0;idx<total;idx++){
+    let front=ars[idx], back=cns[idx];
+    let key=normWord(front);
+    if(!front||!back)continue;
+    if(seen.has(key)){skip++;continue}
+    seen.add(key);
+    cards.push({cat,front,back,base:false});
+    n++;
+  }
+  $("arabicList").value="";
+  $("chineseList").value="";
+  $("twoCatNew").value="";
+  current=cat;
+  save();
+  msg("两栏导入 "+n+" 条，跳过重复 "+skip+" 条");
+}
+function clearTwoColumns(){
+  if($("arabicList"))$("arabicList").value="";
+  if($("chineseList"))$("chineseList").value="";
+  if($("twoCatNew"))$("twoCatNew").value="";
+  msg("已清空两栏");
+}
+
 function importBulk(){let text=$("bulk").value.trim();if(!text){msg("先粘贴内容");return}let defaultCat=($("bulkCatNew").value.trim()||$("bulkCat").value||"中级词汇");let n=0,skip=0;let seen=new Set(cards.map(c=>normWord(c.front)));text.split(/\n+/).forEach(line=>{line=line.trim();if(!line)return;let p=line.split("|").map(x=>x.trim()).filter(Boolean);let cat,front,back;if(p.length>=3){cat=p[0];front=p[1];back=p[2]}else if(p.length>=2){cat=defaultCat;front=p[0];back=p[1]}else{return}let key=normWord(front);if(seen.has(key)){skip++;return}seen.add(key);cards.push({cat,front,back,base:false});n++});$("bulk").value="";$("bulkCatNew").value="";current=defaultCat;save();msg("已导入 "+n+" 条，跳过重复 "+skip+" 条")}
 function clearCustom(){cards=cards.filter(c=>c.base);current='全部';save();msg("已清空自己添加的词")}
 function resetBase(){const custom=cards.filter(c=>!c.base);cards=[...DEFAULT,...custom];current='全部';save();msg("已恢复内置词库")}
