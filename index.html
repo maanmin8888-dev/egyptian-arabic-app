@@ -307,7 +307,7 @@ function tab(x){
   if(x==="favorites")renderFavoriteList();
   if(x==="wrong")renderWrongList();
   if(x==="stats")renderStats()
-});if(x==="match")newMatch();if(x==="quiz")newQuiz()}
+}
 function flip(){
   if(!filtered().length)return;
   showing=!showing;$("front").classList.toggle("hidden",showing);$("back").classList.toggle("hidden",!showing);
@@ -491,7 +491,7 @@ function ans(btn,correct){
   $("good").textContent=good;$("qtotal").textContent=qtotal;
   $("wrongCount").textContent=wrongs.size;
   setTimeout(newQuiz,700)
-}else{btn.style.background="#b83b54"}$("good").textContent=good;$("qtotal").textContent=qtotal;setTimeout(newQuiz,700)}
+}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function escAttr(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,"&quot;")}
 function enc(s){return encodeURIComponent(s)}
