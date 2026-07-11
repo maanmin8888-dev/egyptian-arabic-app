@@ -65,7 +65,7 @@ textarea{min-height:180px}
 </head>
 <body>
 <h1>埃及方言学习 App</h1>
-<div class="muted">V4.0 黑金版 · 内置 1766 词 · 左右配对 · 听写 · 考试 · 连续打卡</div>
+<div class="muted">V4.1 黑金声音版 · 内置 1766 词 · 左右配对 · 听写 · 考试 · 连续打卡</div>
 <div>
   <span class="badge">分类：<b id="currentCat">全部</b></span>
   <span class="badge">词数：<b id="count">0</b></span>
@@ -137,12 +137,32 @@ textarea{min-height:180px}
 
 
 <section id="dictation" class="panel hidden">
-<h2>听写练习</h2>
-<div class="exam-top"><span class="badge">正确：<b id="dictGood">0</b></span><span class="badge">总题：<b id="dictTotal">0</b></span></div>
-<div id="dictPrompt" class="dict-prompt">点“下一题”开始</div>
-<input id="dictInput" dir="rtl" placeholder="根据中文输入阿拉伯语" autocomplete="off" autocapitalize="off">
-<div class="row"><button class="hot" onclick="checkDictation()">检查答案</button><button onclick="revealDictation()">显示答案</button></div>
-<button class="blue" style="width:100%;margin-top:10px" onclick="newDictation()">下一题</button>
+<h2>纯声音听写</h2>
+<div class="exam-top">
+  <span class="badge">正确：<b id="dictGood">0</b></span>
+  <span class="badge">总题：<b id="dictTotal">0</b></span>
+</div>
+
+<div id="dictPrompt" class="dict-prompt">🔊</div>
+<p class="muted">页面不会显示中文或阿语提示。只听声音，然后在下面写出阿拉伯语单词或句子。</p>
+
+<div class="row">
+  <button class="purple" onclick="speakDictation(0.82)">🔊 再听一次</button>
+  <button onclick="speakDictation(0.58)">🐢 慢速播放</button>
+</div>
+
+<input id="dictInput" dir="rtl" placeholder="听声音后，在这里写阿拉伯语" autocomplete="off" autocapitalize="off" spellcheck="false">
+
+<div class="row">
+  <button class="hot" onclick="checkDictation()">检查答案</button>
+  <button onclick="revealDictation()">显示答案</button>
+</div>
+
+<div class="row" style="margin-top:10px">
+  <button class="blue" onclick="newDictation()">下一题并播放</button>
+  <button class="red" onclick="cancelDictation()">取消本题</button>
+</div>
+
 <div id="dictFeedback" class="muted" style="margin-top:12px"></div>
 </section>
 
@@ -232,6 +252,7 @@ textarea{min-height:180px}
 
 <div class="panel" style="margin-left:0;margin-right:0">
 <h2>系统</h2>
+<div class="row"><button onclick="beep('correct');speakArabic('أهلاً وسهلاً',0.78)">🔊 测试声音</button><button onclick="soundEnabled=!soundEnabled;msg(soundEnabled?'按键声音已开启':'按键声音已关闭')">按键音开/关</button></div>
 <div class="row"><button class="hot" onclick="resetBase()">恢复内置词库</button><button class="purple" onclick="removeDuplicates()">整理重复词</button><button class="red" onclick="factoryReset()">全部重置</button></div>
 <p class="small">上传到 GitHub Pages 后，用 Safari 打开网址，再点“分享 → 添加到主屏幕”。</p>
 </div>
@@ -251,6 +272,75 @@ let stats={date:'',today:0,flips:0,quizCorrect:0,quizTotal:0,dictCorrect:0,dictT
 let dictCard=null, examQuestions=[], examPos=0, examScore=0;
 const FAV_KEY='egypt_v4_favorites', WRONG_KEY='egypt_v4_wrongs', LEARNED_KEY='egypt_v4_learned', STATS_KEY='egypt_v4_stats';
 function $(id){return document.getElementById(id)}
+
+let audioCtx=null;
+let soundEnabled=true;
+function ensureAudio(){
+  try{
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended")audioCtx.resume();
+  }catch(e){}
+}
+function beep(kind="tap"){
+  if(!soundEnabled)return;
+  try{
+    ensureAudio();
+    if(!audioCtx)return;
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    const now=audioCtx.currentTime;
+    const cfg=kind==="correct"?[880,0.11,0.10]:kind==="wrong"?[210,0.18,0.12]:[520,0.045,0.035];
+    osc.frequency.setValueAtTime(cfg[0],now);
+    if(kind==="correct")osc.frequency.exponentialRampToValueAtTime(1180,now+cfg[1]);
+    if(kind==="wrong")osc.frequency.exponentialRampToValueAtTime(130,now+cfg[1]);
+    gain.gain.setValueAtTime(cfg[2],now);
+    gain.gain.exponentialRampToValueAtTime(0.001,now+cfg[1]);
+    osc.connect(gain);gain.connect(audioCtx.destination);
+    osc.start(now);osc.stop(now+cfg[1]);
+  }catch(e){}
+}
+function getArabicVoice(){
+  const voices=window.speechSynthesis?speechSynthesis.getVoices():[];
+  return voices.find(v=>/^ar[-_](EG|SA)/i.test(v.lang))
+      || voices.find(v=>/^ar/i.test(v.lang))
+      || null;
+}
+function speakArabic(text,rate=0.82){
+  if(!text){msg("没有可以播放的阿语");return}
+  if(!("speechSynthesis" in window)){msg("这个浏览器不支持语音");return}
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="ar-EG";
+    u.rate=rate;
+    u.pitch=1;
+    u.volume=1;
+    const voice=getArabicVoice();
+    if(voice)u.voice=voice;
+    u.onerror=()=>msg("语音播放失败，请检查手机音量");
+    speechSynthesis.speak(u);
+  }catch(e){msg("语音播放失败")}
+}
+function speakDictation(rate=0.82){
+  if(!dictCard){msg("先点“下一题并播放”");return}
+  speakArabic(dictCard.front,rate);
+}
+if("speechSynthesis" in window){
+  speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+}
+document.addEventListener("click",e=>{
+  const btn=e.target.closest&&e.target.closest("button");
+  if(btn)beep("tap");
+},{passive:true});
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter" && document.activeElement && document.activeElement.id==="dictInput"){
+    e.preventDefault();
+    checkDictation();
+  }
+});
+
+
 function cardKey(c){return normWord(c.front)+"|||"+String(c.back||"").trim()}
 function todayKey(){return new Date().toISOString().slice(0,10)}
 function loadLearningData(){
@@ -531,13 +621,26 @@ function downloadCsv(){
 
 function newDictation(){
   const f=filtered();if(!f.length){$("dictPrompt").textContent="这个分类没有词";return}
-  dictCard=f[Math.floor(Math.random()*f.length)];$("dictPrompt").textContent=dictCard.back;$("dictInput").value="";$("dictFeedback").textContent="";$("dictInput").focus()
+  dictCard=f[Math.floor(Math.random()*f.length)];
+  $("dictPrompt").textContent="🔊";
+  $("dictInput").value="";
+  $("dictFeedback").textContent="";
+  $("dictInput").focus();
+  setTimeout(()=>speakDictation(0.82),120)
+}
+function cancelDictation(){
+  if("speechSynthesis" in window)speechSynthesis.cancel();
+  dictCard=null;
+  $("dictPrompt").textContent="🔊";
+  $("dictInput").value="";
+  $("dictFeedback").textContent="本题已取消，点“下一题并播放”继续。";
+  beep("tap");
 }
 function checkDictation(){
   if(!dictCard)return newDictation();const user=$("dictInput").value.trim();if(!user){msg("请先输入答案");return}
   stats.dictTotal=(stats.dictTotal||0)+1;$("dictTotal").textContent=stats.dictTotal;
-  if(normWord(user)===normWord(dictCard.front)){stats.dictCorrect=(stats.dictCorrect||0)+1;$("dictGood").textContent=stats.dictCorrect;$("dictFeedback").textContent="正确："+dictCard.front;learned.add(cardKey(dictCard))}
-  else{$("dictFeedback").textContent="不正确，答案："+dictCard.front;wrongs.add(cardKey(dictCard))}
+  if(normWord(user)===normWord(dictCard.front)){stats.dictCorrect=(stats.dictCorrect||0)+1;$("dictGood").textContent=stats.dictCorrect;$("dictFeedback").textContent="正确："+dictCard.front;learned.add(cardKey(dictCard));beep("correct");speakArabic(dictCard.front,0.78)}
+  else{$("dictFeedback").textContent="不正确，答案："+dictCard.front;wrongs.add(cardKey(dictCard));beep("wrong");speakArabic(dictCard.front,0.62)}
   bumpToday();saveLearningData();renderStats();$("wrongCount").textContent=wrongs.size
 }
 function revealDictation(){if(dictCard)$("dictFeedback").textContent="答案："+dictCard.front}
@@ -553,7 +656,7 @@ function showExamQuestion(){
 }
 function answerExam(btn,correctEnc){
   const correct=decodeURIComponent(correctEnc),c=examQuestions[examPos];document.querySelectorAll("#examOptions button").forEach(b=>b.disabled=true);
-  if(btn.textContent===correct){examScore++;btn.style.background="var(--green)";learned.add(cardKey(c))}else{btn.style.background="var(--red)";wrongs.add(cardKey(c));document.querySelectorAll("#examOptions button").forEach(b=>{if(b.textContent===correct)b.style.background="var(--green)"})}
+  if(btn.textContent===correct){examScore++;btn.style.background="var(--green)";learned.add(cardKey(c));beep("correct")}else{btn.style.background="var(--red)";wrongs.add(cardKey(c));beep("wrong");document.querySelectorAll("#examOptions button").forEach(b=>{if(b.textContent===correct)b.style.background="var(--green)"})}
   bumpToday();saveLearningData();examPos++;setTimeout(showExamQuestion,650)
 }
 function finishExam(){
@@ -587,10 +690,10 @@ function ans(btn,correct){
   let c=decodeURIComponent(correct);
   const currentCard=filtered().find(x=>x.front===$("q").textContent&&x.back===c);
   if(btn.textContent===c){
-    good++;stats.quizCorrect=(stats.quizCorrect||0)+1;btn.style.background="#2dd47a";btn.style.color="#05160b";
+    beep("correct");good++;stats.quizCorrect=(stats.quizCorrect||0)+1;btn.style.background="#2dd47a";btn.style.color="#05160b";
     if(currentCard)wrongs.delete(cardKey(currentCard));
   }else{
-    btn.style.background="#b83b54";
+    beep("wrong");btn.style.background="#b83b54";
     if(currentCard)wrongs.add(cardKey(currentCard));
   }
   bumpToday();saveLearningData();
