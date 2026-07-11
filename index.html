@@ -7,20 +7,20 @@
 <meta name="apple-mobile-web-app-title" content="埃及方言">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#ff8a1f">
-<title>埃及方言学习</title>
+<title>埃及方言学习 V4</title>
 <style>
-:root{--bg:#081022;--panel:#151b32;--tile:#0d1429;--line:#354060;--text:#f8fafc;--muted:#aeb8cc;--orange:#ff8a1f;--blue:#4f7cff;--red:#b83b54;--green:#2dd47a;--purple:#6d5dfc}
+:root{--bg:#000;--panel:#0b0b0b;--tile:#111;--line:#333;--text:#fff;--muted:#aaa;--orange:#ff941f;--blue:#2f6fff;--red:#b7354e;--green:#27d17f;--purple:#705cff}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;padding:calc(14px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#071023,#101831);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+body{margin:0;padding:calc(14px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));background:#000;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
 h1{font-size:28px;margin:8px 0 6px} h2{font-size:23px;margin:10px 0}
 .muted{color:var(--muted);font-size:15px;line-height:1.55}
-.badge{display:inline-block;background:#0f1731;border:1px solid var(--line);border-radius:999px;padding:8px 12px;margin:4px 4px 4px 0;font-size:15px}
-nav{position:sticky;top:0;z-index:9;display:flex;gap:8px;overflow-x:auto;margin:14px -4px;padding:8px 4px;background:rgba(8,16,34,.95);backdrop-filter:blur(10px);scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{min-width:112px;flex:0 0 auto}
+.badge{display:inline-block;background:#0d0d0d;border:1px solid var(--line);border-radius:999px;padding:8px 12px;margin:4px 4px 4px 0;font-size:15px}
+nav{position:sticky;top:0;z-index:9;display:flex;gap:8px;overflow-x:auto;margin:14px -4px;padding:8px 4px;background:rgba(0,0,0,.96);backdrop-filter:blur(10px);scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{min-width:112px;flex:0 0 auto}
 button{border:0;border-radius:16px;padding:14px 8px;min-height:50px;background:#242d4d;color:white;font-weight:850;font-size:17px}
 button.on,button.hot{background:var(--orange);color:#111} button.blue{background:var(--blue)} button.red{background:var(--red)} button.purple{background:var(--purple)}
-.panel{background:rgba(21,27,50,.96);border:1px solid var(--line);border-radius:22px;padding:16px;margin:14px 0}
+.panel{background:#0b0b0b;border:1px solid var(--line);border-radius:22px;padding:16px;margin:14px 0}
 .hidden{display:none!important}
-.card{min-height:330px;background:#0f1731;border:1px solid var(--line);border-radius:26px;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;margin:14px 0}
+.card{min-height:330px;background:#0d0d0d;border:1px solid var(--line);border-radius:26px;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;margin:14px 0}
 .ar{font-size:48px;direction:rtl;line-height:1.45;font-weight:900;white-space:normal;overflow-wrap:break-word}
 .cn{font-size:38px;font-weight:900;line-height:1.45;white-space:normal}
 .row{display:flex;gap:10px} .row button{flex:1}
@@ -28,7 +28,7 @@ button.on,button.hot{background:var(--orange);color:#111} button.blue{background
 .tile{min-height:92px;background:var(--tile);border:1px solid var(--line);border-radius:20px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-weight:900;font-size:28px;line-height:1.35;white-space:normal;overflow-wrap:break-word}
 .tile.arabic{direction:rtl;font-size:34px;line-height:1.45} .tile.sel{outline:4px solid var(--orange)} .tile.done{opacity:.18;transform:scale(.99)}
 .choice{width:100%;margin:9px 0;min-height:70px;font-size:24px;line-height:1.35}
-textarea,input,select{width:100%;box-sizing:border-box;background:#0d1429;color:white;border:1px solid var(--line);border-radius:16px;padding:14px;font-size:18px;margin:6px 0 10px}
+textarea,input,select{width:100%;box-sizing:border-box;background:#111;color:white;border:1px solid var(--line);border-radius:16px;padding:14px;font-size:18px;margin:6px 0 10px}
 textarea{min-height:180px}
 .item{border-bottom:1px solid var(--line);padding:14px} .item:last-child{border-bottom:0}
 .item .a{direction:rtl;font-size:30px;line-height:1.45;font-weight:900;text-align:right;overflow-wrap:break-word}
@@ -36,9 +36,9 @@ textarea{min-height:180px}
 #msg{color:var(--green);min-height:22px;margin-top:4px}
 .catbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0} .catbar button{min-height:42px;padding:10px 12px;font-size:15px;border-radius:999px}
 .small{font-size:13px;color:var(--muted)}
-.searchbox{position:sticky;top:76px;z-index:7;background:rgba(8,16,34,.96);padding:8px 0}
+.searchbox{position:sticky;top:76px;z-index:7;background:rgba(0,0,0,.96);padding:8px 0}
 .statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:#0d1429;border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center}
+.stat{background:#111;border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center}
 .stat b{display:block;font-size:30px;margin-top:6px}
 .actionbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 .actionbar button{flex:1;min-width:130px}
@@ -46,16 +46,30 @@ textarea{min-height:180px}
 .starbtn.on{background:#f7b928;color:#111}
 .tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin:4px;font-size:13px;color:var(--muted)}
 
+
+.match-board{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.match-col{display:flex;flex-direction:column;gap:10px}
+.match-item{min-height:82px;background:#111;border:1px solid #333;border-radius:18px;padding:12px;font-size:21px;font-weight:850;display:flex;align-items:center;justify-content:center;text-align:center;overflow-wrap:anywhere}
+.match-item.arabic{direction:rtl;font-size:27px;line-height:1.35}
+.match-item.sel{outline:3px solid var(--orange)}
+.match-item.done{opacity:.18;pointer-events:none}
+.progress-wrap{height:16px;background:#171717;border:1px solid #333;border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:var(--orange);width:0%}
+.big-number{font-size:34px;font-weight:900}
+.dict-prompt{font-size:36px;font-weight:900;text-align:center;padding:28px 10px}
+.exam-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+@media (max-width:420px){.match-item{font-size:18px;min-height:76px}.match-item.arabic{font-size:23px}}
 @media (min-width:700px){body{max-width:760px;margin:0 auto}.grid{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
 <h1>埃及方言学习 App</h1>
-<div class="muted">V3.0 专业版 · 内置 1766 词 · 搜索 · 收藏 · 错题 · 学习统计</div>
+<div class="muted">V4.0 黑金版 · 内置 1766 词 · 左右配对 · 听写 · 考试 · 连续打卡</div>
 <div>
   <span class="badge">分类：<b id="currentCat">全部</b></span>
   <span class="badge">词数：<b id="count">0</b></span>
-  <span class="badge">保存：<b id="saveStatus">正常</b></span><span class="badge">收藏：<b id="favCount">0</b></span><span class="badge">错题：<b id="wrongCount">0</b></span>
+  <span class="badge">保存：<b id="saveStatus">正常</b></span><span class="badge">收藏：<b id="favCount">0</b></span><span class="badge">错题：<b id="wrongCount">0</b></span><span class="badge">连续：<b id="streakCount">0</b>天</span><span class="badge">进度：<b id="progressTop">0%</b></span>
   <span class="badge" id="msg"></span>
 </div>
 <div class="catbar" id="catButtons"></div>
@@ -67,6 +81,8 @@ textarea{min-height:180px}
 <button id="bWrong" onclick="tab('wrong')">错题</button>
 <button id="bMatch" onclick="tab('match')">配对</button>
 <button id="bQuiz" onclick="tab('quiz')">选择</button>
+<button id="bDictation" onclick="tab('dictation')">听写</button>
+<button id="bExam" onclick="tab('exam')">考试</button>
 <button id="bStats" onclick="tab('stats')">统计</button>
 <button id="bManage" onclick="tab('manage')">管理</button>
 </nav>
@@ -107,9 +123,9 @@ textarea{min-height:180px}
 
 <section id="match" class="panel hidden">
 <div><span class="badge">配对得分：<b id="score">0</b></span></div>
-<p class="muted">点一个阿语，再点对应中文。正确会变淡。</p>
+<p class="muted">左边点阿语，右边点对应中文。正确后自动消失。</p>
 <button class="blue" style="width:100%" onclick="newMatch()">换一组</button>
-<div id="matchGrid" class="grid" style="margin-top:14px"></div>
+<div id="matchGrid" class="match-board"></div>
 </section>
 
 <section id="quiz" class="panel hidden">
@@ -120,6 +136,31 @@ textarea{min-height:180px}
 </section>
 
 
+<section id="dictation" class="panel hidden">
+<h2>听写练习</h2>
+<div class="exam-top"><span class="badge">正确：<b id="dictGood">0</b></span><span class="badge">总题：<b id="dictTotal">0</b></span></div>
+<div id="dictPrompt" class="dict-prompt">点“下一题”开始</div>
+<input id="dictInput" dir="rtl" placeholder="根据中文输入阿拉伯语" autocomplete="off" autocapitalize="off">
+<div class="row"><button class="hot" onclick="checkDictation()">检查答案</button><button onclick="revealDictation()">显示答案</button></div>
+<button class="blue" style="width:100%;margin-top:10px" onclick="newDictation()">下一题</button>
+<div id="dictFeedback" class="muted" style="margin-top:12px"></div>
+</section>
+
+<section id="exam" class="panel hidden">
+<h2>考试模式</h2>
+<div id="examSetup">
+<p class="muted">选择题数，系统会从当前分类随机出题。</p>
+<select id="examCount"><option value="10">10题</option><option value="20">20题</option><option value="50">50题</option></select>
+<button class="hot" style="width:100%" onclick="startExam()">开始考试</button>
+</div>
+<div id="examRun" class="hidden">
+<div class="exam-top"><span class="badge">第 <b id="examIndex">0</b>/<b id="examTotal">0</b></span><span class="badge">得分：<b id="examScore">0</b></span></div>
+<div class="card" style="min-height:200px"><div id="examQuestion" class="ar"></div></div>
+<div id="examOptions"></div>
+</div>
+<div id="examResult" class="hidden"></div>
+</section>
+
 <section id="stats" class="panel hidden">
 <h2>学习统计</h2>
 <div class="statgrid">
@@ -128,9 +169,9 @@ textarea{min-height:180px}
 <div class="stat">错题<b id="statWrong">0</b></div>
 <div class="stat">今日学习<b id="statToday">0</b></div>
 <div class="stat">累计翻卡<b id="statFlips">0</b></div>
-<div class="stat">选择正确率<b id="statRate">0%</b></div>
+<div class="stat">选择正确率<b id="statRate">0%</b></div><div class="stat">连续打卡<b id="statStreak">0天</b></div><div class="stat">学习进度<b id="statProgress">0%</b></div>
 </div>
-<p class="muted" style="margin-top:14px">学习数据只保存在当前设备，不会上传到服务器。</p>
+<div class="progress-wrap" style="margin-top:16px"><div id="progressBar" class="progress-fill"></div></div><p class="muted" style="margin-top:10px">“已学会”的词会计入学习进度。每天学习一次，就会连续打卡。</p>
 <button class="red" style="width:100%" onclick="resetStats()">重置学习统计</button>
 </section>
 
@@ -205,15 +246,17 @@ const PRESET_CATS = ["中级词汇", "高级词汇", "高级表达", "完整句�
 const STORE_KEY = "egypt_final_1766_v2_cards";
 const MIGRATE_KEY = "egypt_final_1766_v2_migrated";
 let cards=DEFAULT.map(c=>({...c})), current='全部', i=0, showing=false, selected=null, score=0, good=0, qtotal=0;
-let favorites=new Set(), wrongs=new Set(), randomMode=false, specialMode='';
-let stats={date:'',today:0,flips:0,quizCorrect:0,quizTotal:0,learned:0};
-const FAV_KEY='egypt_v3_favorites', WRONG_KEY='egypt_v3_wrongs', STATS_KEY='egypt_v3_stats';
+let favorites=new Set(), wrongs=new Set(), learned=new Set(), randomMode=false, specialMode='';
+let stats={date:'',today:0,flips:0,quizCorrect:0,quizTotal:0,dictCorrect:0,dictTotal:0,streak:0,lastStudyDate:''};
+let dictCard=null, examQuestions=[], examPos=0, examScore=0;
+const FAV_KEY='egypt_v4_favorites', WRONG_KEY='egypt_v4_wrongs', LEARNED_KEY='egypt_v4_learned', STATS_KEY='egypt_v4_stats';
 function $(id){return document.getElementById(id)}
 function cardKey(c){return normWord(c.front)+"|||"+String(c.back||"").trim()}
 function todayKey(){return new Date().toISOString().slice(0,10)}
 function loadLearningData(){
   try{favorites=new Set(JSON.parse(localStorage.getItem(FAV_KEY)||"[]"))}catch(e){favorites=new Set()}
   try{wrongs=new Set(JSON.parse(localStorage.getItem(WRONG_KEY)||"[]"))}catch(e){wrongs=new Set()}
+  try{learned=new Set(JSON.parse(localStorage.getItem(LEARNED_KEY)||"[]"))}catch(e){learned=new Set()}
   try{stats=Object.assign(stats,JSON.parse(localStorage.getItem(STATS_KEY)||"{}"))}catch(e){}
   if(stats.date!==todayKey()){stats.date=todayKey();stats.today=0;saveLearningData()}
 }
@@ -221,13 +264,22 @@ function saveLearningData(){
   try{
     localStorage.setItem(FAV_KEY,JSON.stringify([...favorites]));
     localStorage.setItem(WRONG_KEY,JSON.stringify([...wrongs]));
+    localStorage.setItem(LEARNED_KEY,JSON.stringify([...learned]));
     localStorage.setItem(STATS_KEY,JSON.stringify(stats));
   }catch(e){}
 }
 function findCardByKey(k){return cards.find(c=>cardKey(c)===k)}
+function dateDiffDays(a,b){return Math.round((new Date(a+"T00:00:00")-new Date(b+"T00:00:00"))/86400000)}
 function bumpToday(){
-  if(stats.date!==todayKey()){stats.date=todayKey();stats.today=0}
-  stats.today++;saveLearningData()
+  const t=todayKey();
+  if(stats.date!==t){stats.date=t;stats.today=0}
+  stats.today++;
+  if(stats.lastStudyDate!==t){
+    if(!stats.lastStudyDate)stats.streak=1;
+    else stats.streak=dateDiffDays(t,stats.lastStudyDate)===1?(stats.streak||0)+1:1;
+    stats.lastStudyDate=t;
+  }
+  saveLearningData()
 }
 function msg(t){$("msg").textContent=t; setTimeout(()=>{$("msg").textContent=''},2200)}
 function migrateCat(cat){
@@ -259,6 +311,7 @@ function load(){
   }
   cards=cards.map(c=>({...c,cat:migrateCat(c.cat)}));
   loadLearningData();
+  if($("dictGood"))$("dictGood").textContent=stats.dictCorrect||0;if($("dictTotal"))$("dictTotal").textContent=stats.dictTotal||0;
   render();
 }
 function save(show=true){try{localStorage.setItem(STORE_KEY,JSON.stringify(cards));$("saveStatus").textContent="已保存";if(show)msg("已保存")}catch(e){$("saveStatus").textContent="保存失败";msg("保存失败，请生成备份")} render();}
@@ -275,6 +328,7 @@ function renderSelects(){
   if($("singleCat"))$("singleCat").innerHTML=opts;
   if($("bulkCat"))$("bulkCat").innerHTML=opts;
   if($("twoCat"))$("twoCat").innerHTML=opts;
+  if($("searchCat"))$("searchCat").innerHTML=`<option>全部</option>`+opts;
 }
 function renderCats(){$("catButtons").innerHTML=categories().map(c=>`<button class="${c===current?'hot':''}" onclick="setCat('${escAttr(c)}')">${esc(c)}</button>`).join('')}
 function setCat(c){specialMode='';current=c;i=0;render()}
@@ -284,6 +338,7 @@ function render(){
   $("currentCat").textContent=specialMode==='favorites'?'收藏':specialMode==='wrong'?'错题':current;
   $("count").textContent=f.length;$("total").textContent=f.length;
   $("favCount").textContent=favorites.size;$("wrongCount").textContent=wrongs.size;
+  $("streakCount").textContent=stats.streak||0;$("progressTop").textContent=cards.length?Math.round(learned.size/cards.length*100)+"%":"0%";
   if(i>=f.length)i=0;showing=false;
   if(f.length){
     $("idx").textContent=i+1;$("front").textContent=f[i].front;$("back").textContent=f[i].back;
@@ -297,12 +352,13 @@ function render(){
   renderList();renderCatManage();renderSearch();renderFavoriteList();renderWrongList();renderStats()
 }
 function tab(x){
-  ["study","search","favorites","wrong","match","quiz","stats","manage"].forEach(y=>{
+  ["study","search","favorites","wrong","match","quiz","dictation","exam","stats","manage"].forEach(y=>{
     $(y).classList.toggle("hidden",y!==x);
     $("b"+y[0].toUpperCase()+y.slice(1)).classList.toggle("on",y===x)
   });
   if(x==="match")newMatch();
   if(x==="quiz")newQuiz();
+  if(x==="dictation")newDictation();
   if(x==="search")renderSearch();
   if(x==="favorites")renderFavoriteList();
   if(x==="wrong")renderWrongList();
@@ -317,7 +373,7 @@ function next(){const f=filtered();if(f.length){i=randomMode?Math.floor(Math.ran
 function prev(){const f=filtered();if(f.length){i=(i-1+f.length)%f.length;render()}}
 function toggleRandom(){randomMode=!randomMode;render();msg(randomMode?"已切换随机学习":"已切换顺序学习")}
 function toggleFavoriteCurrent(){const f=filtered();if(!f.length)return;const k=cardKey(f[i]);favorites.has(k)?favorites.delete(k):favorites.add(k);saveLearningData();render()}
-function markLearned(){stats.learned=(stats.learned||0)+1;bumpToday();msg("已记录为学会");next()}
+function markLearned(){const f=filtered();if(!f.length)return;learned.add(cardKey(f[i]));bumpToday();saveLearningData();msg("已加入学习进度");next()}
 
 function normWord(s){
   return String(s||"")
@@ -374,8 +430,8 @@ function importBulk(){let text=$("bulk").value.trim();if(!text){msg("先粘贴�
 function clearCustom(){cards=cards.filter(c=>c.base);current='全部';save();msg("已清空自己添加的词")}
 function resetBase(){const custom=cards.filter(c=>!c.base);cards=[...DEFAULT,...custom];current='全部';save();msg("已恢复内置词库")}
 function factoryReset(){
-  cards=[...DEFAULT];current='全部';specialMode='';favorites.clear();wrongs.clear();
-  stats={date:todayKey(),today:0,flips:0,quizCorrect:0,quizTotal:0,learned:0};
+  cards=[...DEFAULT];current='全部';specialMode='';favorites.clear();wrongs.clear();learned.clear();
+  stats={date:todayKey(),today:0,flips:0,quizCorrect:0,quizTotal:0,dictCorrect:0,dictTotal:0,streak:0,lastStudyDate:''};learned.clear();
   saveLearningData();save();msg("词库和学习记录已全部重置")
 }
 function backupText(){return JSON.stringify(cards,null,2)}
@@ -455,8 +511,9 @@ function renderStats(){
   $("statTotal").textContent=cards.length;$("statFav").textContent=favorites.size;$("statWrong").textContent=wrongs.size;
   $("statToday").textContent=stats.today||0;$("statFlips").textContent=stats.flips||0;
   const rate=stats.quizTotal?Math.round(stats.quizCorrect/stats.quizTotal*100):0;$("statRate").textContent=rate+"%";
+  $("statStreak").textContent=(stats.streak||0)+"天";const p=cards.length?Math.round(learned.size/cards.length*100):0;$("statProgress").textContent=p+"%";$("progressBar").style.width=p+"%";
 }
-function resetStats(){stats={date:todayKey(),today:0,flips:0,quizCorrect:0,quizTotal:0,learned:0};saveLearningData();render();msg("统计已重置")}
+function resetStats(){stats={date:todayKey(),today:0,flips:0,quizCorrect:0,quizTotal:0,dictCorrect:0,dictTotal:0,streak:0,lastStudyDate:''};learned.clear();saveLearningData();render();msg("统计已重置")}
 function downloadTextFile(name,text,type='text/plain;charset=utf-8'){
   const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");
   a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)
@@ -471,10 +528,59 @@ function downloadCsv(){
   const csv="\ufeff"+rows.map(r=>r.map(csvCell).join(",")).join("\r\n");
   downloadTextFile("埃及方言词库_"+cards.length+"条.csv",csv,"text/csv;charset=utf-8");msg("CSV 已导出，可用 Excel 打开")
 }
+
+function newDictation(){
+  const f=filtered();if(!f.length){$("dictPrompt").textContent="这个分类没有词";return}
+  dictCard=f[Math.floor(Math.random()*f.length)];$("dictPrompt").textContent=dictCard.back;$("dictInput").value="";$("dictFeedback").textContent="";$("dictInput").focus()
+}
+function checkDictation(){
+  if(!dictCard)return newDictation();const user=$("dictInput").value.trim();if(!user){msg("请先输入答案");return}
+  stats.dictTotal=(stats.dictTotal||0)+1;$("dictTotal").textContent=stats.dictTotal;
+  if(normWord(user)===normWord(dictCard.front)){stats.dictCorrect=(stats.dictCorrect||0)+1;$("dictGood").textContent=stats.dictCorrect;$("dictFeedback").textContent="正确："+dictCard.front;learned.add(cardKey(dictCard))}
+  else{$("dictFeedback").textContent="不正确，答案："+dictCard.front;wrongs.add(cardKey(dictCard))}
+  bumpToday();saveLearningData();renderStats();$("wrongCount").textContent=wrongs.size
+}
+function revealDictation(){if(dictCard)$("dictFeedback").textContent="答案："+dictCard.front}
+function startExam(){
+  const f=filtered();if(f.length<4){msg("当前分类至少需要4个词");return}
+  const n=Math.min(Number($("examCount").value)||10,f.length);examQuestions=[...f].sort(()=>Math.random()-.5).slice(0,n);examPos=0;examScore=0;
+  $("examSetup").classList.add("hidden");$("examRun").classList.remove("hidden");$("examResult").classList.add("hidden");$("examTotal").textContent=n;showExamQuestion()
+}
+function showExamQuestion(){
+  if(examPos>=examQuestions.length)return finishExam();const c=examQuestions[examPos],f=filtered();$("examIndex").textContent=examPos+1;$("examScore").textContent=examScore;$("examQuestion").textContent=c.front;
+  const opts=[c.back];while(opts.length<4){const x=f[Math.floor(Math.random()*f.length)].back;if(!opts.includes(x))opts.push(x)}opts.sort(()=>Math.random()-.5);
+  $("examOptions").innerHTML=opts.map(o=>`<button class="choice" onclick="answerExam(this,'${enc(c.back)}')">${esc(o)}</button>`).join("")
+}
+function answerExam(btn,correctEnc){
+  const correct=decodeURIComponent(correctEnc),c=examQuestions[examPos];document.querySelectorAll("#examOptions button").forEach(b=>b.disabled=true);
+  if(btn.textContent===correct){examScore++;btn.style.background="var(--green)";learned.add(cardKey(c))}else{btn.style.background="var(--red)";wrongs.add(cardKey(c));document.querySelectorAll("#examOptions button").forEach(b=>{if(b.textContent===correct)b.style.background="var(--green)"})}
+  bumpToday();saveLearningData();examPos++;setTimeout(showExamQuestion,650)
+}
+function finishExam(){
+  $("examRun").classList.add("hidden");$("examResult").classList.remove("hidden");const pct=Math.round(examScore/examQuestions.length*100);$("examResult").innerHTML=`<div class="stat"><div>考试完成</div><b>${examScore}/${examQuestions.length}</b><div>${pct}%</div></div><button class="hot" style="width:100%;margin-top:12px" onclick="restartExamSetup()">再考一次</button>`;render()
+}
+function restartExamSetup(){$("examSetup").classList.remove("hidden");$("examResult").classList.add("hidden")}
 function renderList(){const f=filtered(),box=$("list");if(!f.length){box.innerHTML='<div class="item muted">没有词。</div>';return}box.innerHTML=f.map((c,idx)=>`<div class="item"><div class="a">${esc(c.front)}</div><div class="c">${esc(c.back)}</div><div class="cat">分类：${esc(c.cat)}${c.base?' · 内置':' · 自己添加'}</div><button class="red" onclick="delShown(${idx})">删除这一条</button></div>`).join("")}
 function delShown(n){const target=filtered()[n];const pos=cards.indexOf(target);if(pos>=0)cards.splice(pos,1);if(i>=filtered().length)i=0;save()}
-function newMatch(){selected=null;score=0;$("score").textContent=0;let g=$("matchGrid"),f=filtered();if(f.length<2){g.innerHTML='<p class="muted">至少需要2个词。</p>';return}let subset=[...f].sort(()=>Math.random()-.5).slice(0,Math.min(5,f.length));let tiles=[];subset.forEach((c,n)=>{tiles.push({id:n,type:"a",txt:c.front});tiles.push({id:n,type:"c",txt:c.back})});tiles.sort(()=>Math.random()-.5);g.innerHTML=tiles.map(t=>`<div class="tile ${t.type==='a'?'arabic':''}" data-id="${t.id}" data-type="${t.type}" onclick="tap(this)">${esc(t.txt)}</div>`).join("")}
-function tap(el){if(el.classList.contains("done"))return;if(!selected){selected=el;el.classList.add("sel");return}if(selected===el){el.classList.remove("sel");selected=null;return}let ok=selected.dataset.id===el.dataset.id&&selected.dataset.type!==el.dataset.type;if(ok){selected.classList.add("done");el.classList.add("done");selected.classList.remove("sel");score++;$("score").textContent=score}else{el.classList.add("sel");setTimeout(()=>{el.classList.remove("sel");selected&&selected.classList.remove("sel")},300)}selected=null}
+function newMatch(){
+  selected={left:null,right:null};score=0;$("score").textContent=0;
+  const g=$("matchGrid"),f=filtered();
+  if(f.length<2){g.innerHTML='<p class="muted">至少需要2个词。</p>';return}
+  const subset=[...f].sort(()=>Math.random()-.5).slice(0,Math.min(6,f.length));
+  const left=subset.map((c,n)=>({id:n,txt:c.front})).sort(()=>Math.random()-.5);
+  const right=subset.map((c,n)=>({id:n,txt:c.back})).sort(()=>Math.random()-.5);
+  g.innerHTML=`<div class="match-col">${left.map(x=>`<button class="match-item arabic" data-side="left" data-id="${x.id}" onclick="tapMatch(this)">${esc(x.txt)}</button>`).join('')}</div><div class="match-col">${right.map(x=>`<button class="match-item" data-side="right" data-id="${x.id}" onclick="tapMatch(this)">${esc(x.txt)}</button>`).join('')}</div>`;
+}
+function tapMatch(el){
+  const side=el.dataset.side;
+  document.querySelectorAll(`.match-item[data-side="${side}"]`).forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel');selected[side]=el;
+  if(selected.left&&selected.right){
+    if(selected.left.dataset.id===selected.right.dataset.id){selected.left.classList.add('done');selected.right.classList.add('done');score++;$("score").textContent=score;bumpToday()}
+    else{selected.left.style.outlineColor='var(--red)';selected.right.style.outlineColor='var(--red)';setTimeout(()=>{selected.left&&(selected.left.style.outlineColor='');selected.right&&(selected.right.style.outlineColor='')},350)}
+    selected.left.classList.remove('sel');selected.right.classList.remove('sel');selected={left:null,right:null};
+  }
+}
 function newQuiz(){const f=filtered();if(f.length<4){$("q").textContent="至少需要4个词";$("opts").innerHTML="";return}let c=f[Math.floor(Math.random()*f.length)];$("q").textContent=c.front;let opts=[c.back];while(opts.length<4){let x=f[Math.floor(Math.random()*f.length)].back;if(!opts.includes(x))opts.push(x)}opts.sort(()=>Math.random()-.5);$("opts").innerHTML=opts.map(o=>`<button class="choice" onclick="ans(this,'${enc(c.back)}')">${esc(o)}</button>`).join("")}
 function ans(btn,correct){
   qtotal++;stats.quizTotal=(stats.quizTotal||0)+1;
