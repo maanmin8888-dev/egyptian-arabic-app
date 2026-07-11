@@ -15,7 +15,7 @@ body{margin:0;padding:calc(14px + env(safe-area-inset-top)) 14px calc(24px + env
 h1{font-size:28px;margin:8px 0 6px} h2{font-size:23px;margin:10px 0}
 .muted{color:var(--muted);font-size:15px;line-height:1.55}
 .badge{display:inline-block;background:#0f1731;border:1px solid var(--line);border-radius:999px;padding:8px 12px;margin:4px 4px 4px 0;font-size:15px}
-nav{position:sticky;top:0;z-index:9;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px -4px;padding:8px 4px;background:rgba(8,16,34,.95);backdrop-filter:blur(10px)}
+nav{position:sticky;top:0;z-index:9;display:flex;gap:8px;overflow-x:auto;margin:14px -4px;padding:8px 4px;background:rgba(8,16,34,.95);backdrop-filter:blur(10px);scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{min-width:112px;flex:0 0 auto}
 button{border:0;border-radius:16px;padding:14px 8px;min-height:50px;background:#242d4d;color:white;font-weight:850;font-size:17px}
 button.on,button.hot{background:var(--orange);color:#111} button.blue{background:var(--blue)} button.red{background:var(--red)} button.purple{background:var(--purple)}
 .panel{background:rgba(21,27,50,.96);border:1px solid var(--line);border-radius:22px;padding:16px;margin:14px 0}
@@ -36,24 +36,38 @@ textarea{min-height:180px}
 #msg{color:var(--green);min-height:22px;margin-top:4px}
 .catbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0} .catbar button{min-height:42px;padding:10px 12px;font-size:15px;border-radius:999px}
 .small{font-size:13px;color:var(--muted)}
+.searchbox{position:sticky;top:76px;z-index:7;background:rgba(8,16,34,.96);padding:8px 0}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#0d1429;border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center}
+.stat b{display:block;font-size:30px;margin-top:6px}
+.actionbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.actionbar button{flex:1;min-width:130px}
+.starbtn{background:#374161}
+.starbtn.on{background:#f7b928;color:#111}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin:4px;font-size:13px;color:var(--muted)}
+
 @media (min-width:700px){body{max-width:760px;margin:0 auto}.grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <h1>埃及方言学习 App</h1>
-<div class="muted">C1 冲高级共享版 · 内置 1766 词 · 两栏导入 · 防重复 · 可一键复制</div>
+<div class="muted">V3.0 专业版 · 内置 1766 词 · 搜索 · 收藏 · 错题 · 学习统计</div>
 <div>
   <span class="badge">分类：<b id="currentCat">全部</b></span>
   <span class="badge">词数：<b id="count">0</b></span>
-  <span class="badge">保存：<b id="saveStatus">正常</b></span>
+  <span class="badge">保存：<b id="saveStatus">正常</b></span><span class="badge">收藏：<b id="favCount">0</b></span><span class="badge">错题：<b id="wrongCount">0</b></span>
   <span class="badge" id="msg"></span>
 </div>
 <div class="catbar" id="catButtons"></div>
 
 <nav>
 <button id="bStudy" class="on" onclick="tab('study')">背词</button>
+<button id="bSearch" onclick="tab('search')">搜索</button>
+<button id="bFavorites" onclick="tab('favorites')">收藏</button>
+<button id="bWrong" onclick="tab('wrong')">错题</button>
 <button id="bMatch" onclick="tab('match')">配对</button>
 <button id="bQuiz" onclick="tab('quiz')">选择</button>
+<button id="bStats" onclick="tab('stats')">统计</button>
 <button id="bManage" onclick="tab('manage')">管理</button>
 </nav>
 
@@ -61,6 +75,34 @@ textarea{min-height:180px}
 <div><span class="badge">第 <b id="idx">1</b> / <b id="total">0</b></span></div>
 <div class="card" onclick="flip()"><div><div id="front" class="ar"></div><div id="back" class="cn hidden"></div><div class="muted" style="margin-top:16px">点卡片看答案</div></div></div>
 <div class="row"><button onclick="prev()">上一个</button><button class="hot" onclick="flip()">看答案</button><button onclick="next()">下一个</button></div>
+<div class="actionbar">
+<button id="favBtn" class="starbtn" onclick="toggleFavoriteCurrent()">☆ 收藏</button>
+<button onclick="markLearned()">✓ 已学会</button>
+<button onclick="toggleRandom()" id="randomBtn">顺序学习</button>
+</div>
+</section>
+
+
+<section id="search" class="panel hidden">
+<h2>搜索词汇</h2>
+<div class="searchbox">
+<input id="searchInput" placeholder="输入阿语或中文，例如：المطار / 机场" oninput="renderSearch()">
+<select id="searchCat" onchange="renderSearch()"></select>
+</div>
+<div id="searchResults"></div>
+</section>
+
+<section id="favorites" class="panel hidden">
+<h2>我的收藏</h2>
+<p class="muted">收藏的难词会集中显示在这里。</p>
+<div id="favoriteList"></div>
+</section>
+
+<section id="wrong" class="panel hidden">
+<h2>错题本</h2>
+<p class="muted">选择题答错后会自动加入。</p>
+<div class="row"><button class="red" onclick="clearWrong()">清空错题本</button><button onclick="studyWrong()">只背错题</button></div>
+<div id="wrongList" style="margin-top:12px"></div>
 </section>
 
 <section id="match" class="panel hidden">
@@ -75,6 +117,21 @@ textarea{min-height:180px}
 <div class="card" style="min-height:210px"><div id="q" class="ar">点下一题</div></div>
 <div id="opts"></div>
 <button class="blue" style="width:100%;margin-top:10px" onclick="newQuiz()">下一题</button>
+</section>
+
+
+<section id="stats" class="panel hidden">
+<h2>学习统计</h2>
+<div class="statgrid">
+<div class="stat">总词汇<b id="statTotal">0</b></div>
+<div class="stat">收藏<b id="statFav">0</b></div>
+<div class="stat">错题<b id="statWrong">0</b></div>
+<div class="stat">今日学习<b id="statToday">0</b></div>
+<div class="stat">累计翻卡<b id="statFlips">0</b></div>
+<div class="stat">选择正确率<b id="statRate">0%</b></div>
+</div>
+<p class="muted" style="margin-top:14px">学习数据只保存在当前设备，不会上传到服务器。</p>
+<button class="red" style="width:100%" onclick="resetStats()">重置学习统计</button>
 </section>
 
 <section id="manage" class="panel hidden">
@@ -122,6 +179,10 @@ textarea{min-height:180px}
 <button class="blue" onclick="downloadBackup()">下载备份文件</button>
 </div>
 <div class="row">
+<button onclick="downloadTxt()">导出 TXT</button>
+<button onclick="downloadCsv()">导出 Excel/CSV</button>
+</div>
+<div class="row">
 <button onclick="makeBackup()">显示备份文字</button>
 <button class="blue" onclick="restoreBackup()">恢复备份</button>
 </div>
@@ -144,7 +205,30 @@ const PRESET_CATS = ["中级词汇", "高级词汇", "高级表达", "完整句�
 const STORE_KEY = "egypt_final_1766_v2_cards";
 const MIGRATE_KEY = "egypt_final_1766_v2_migrated";
 let cards=DEFAULT.map(c=>({...c})), current='全部', i=0, showing=false, selected=null, score=0, good=0, qtotal=0;
+let favorites=new Set(), wrongs=new Set(), randomMode=false, specialMode='';
+let stats={date:'',today:0,flips:0,quizCorrect:0,quizTotal:0,learned:0};
+const FAV_KEY='egypt_v3_favorites', WRONG_KEY='egypt_v3_wrongs', STATS_KEY='egypt_v3_stats';
 function $(id){return document.getElementById(id)}
+function cardKey(c){return normWord(c.front)+"|||"+String(c.back||"").trim()}
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function loadLearningData(){
+  try{favorites=new Set(JSON.parse(localStorage.getItem(FAV_KEY)||"[]"))}catch(e){favorites=new Set()}
+  try{wrongs=new Set(JSON.parse(localStorage.getItem(WRONG_KEY)||"[]"))}catch(e){wrongs=new Set()}
+  try{stats=Object.assign(stats,JSON.parse(localStorage.getItem(STATS_KEY)||"{}"))}catch(e){}
+  if(stats.date!==todayKey()){stats.date=todayKey();stats.today=0;saveLearningData()}
+}
+function saveLearningData(){
+  try{
+    localStorage.setItem(FAV_KEY,JSON.stringify([...favorites]));
+    localStorage.setItem(WRONG_KEY,JSON.stringify([...wrongs]));
+    localStorage.setItem(STATS_KEY,JSON.stringify(stats));
+  }catch(e){}
+}
+function findCardByKey(k){return cards.find(c=>cardKey(c)===k)}
+function bumpToday(){
+  if(stats.date!==todayKey()){stats.date=todayKey();stats.today=0}
+  stats.today++;saveLearningData()
+}
 function msg(t){$("msg").textContent=t; setTimeout(()=>{$("msg").textContent=''},2200)}
 function migrateCat(cat){
   if(cat==="旅行"||cat==="交通出行"||cat==="生活办事"||cat==="餐厅")return "日常办事";
@@ -174,10 +258,16 @@ function load(){
     $("saveStatus").textContent="内置词库";
   }
   cards=cards.map(c=>({...c,cat:migrateCat(c.cat)}));
+  loadLearningData();
   render();
 }
 function save(show=true){try{localStorage.setItem(STORE_KEY,JSON.stringify(cards));$("saveStatus").textContent="已保存";if(show)msg("已保存")}catch(e){$("saveStatus").textContent="保存失败";msg("保存失败，请生成备份")} render();}
-function filtered(){return current==='全部'?cards:cards.filter(c=>c.cat===current)}
+function filtered(){
+  let arr=current==='全部'?cards:cards.filter(c=>c.cat===current);
+  if(specialMode==='favorites')arr=arr.filter(c=>favorites.has(cardKey(c)));
+  if(specialMode==='wrong')arr=arr.filter(c=>wrongs.has(cardKey(c)));
+  return arr
+}
 function categories(){const set=new Set(['全部',...PRESET_CATS]);cards.forEach(c=>set.add(c.cat||'中级词汇'));return [...set]}
 function selectCategories(){const set=new Set(PRESET_CATS);cards.forEach(c=>set.add(c.cat||'中级词汇'));return [...set]}
 function renderSelects(){
@@ -187,11 +277,47 @@ function renderSelects(){
   if($("twoCat"))$("twoCat").innerHTML=opts;
 }
 function renderCats(){$("catButtons").innerHTML=categories().map(c=>`<button class="${c===current?'hot':''}" onclick="setCat('${escAttr(c)}')">${esc(c)}</button>`).join('')}
-function setCat(c){current=c;i=0;render()}
-function render(){renderCats();renderSelects();const f=filtered();$("currentCat").textContent=current;$("count").textContent=f.length;$("total").textContent=f.length;if(i>=f.length)i=0;showing=false;if(f.length){$("idx").textContent=i+1;$("front").textContent=f[i].front;$("back").textContent=f[i].back;$("front").classList.remove("hidden");$("back").classList.add("hidden")}else{$("idx").textContent=0;$("front").textContent="这个分类没有词";$("back").textContent=""}renderList();renderCatManage()}
-function tab(x){["study","match","quiz","manage"].forEach(y=>{$(y).classList.toggle("hidden",y!==x);$("b"+y[0].toUpperCase()+y.slice(1)).classList.toggle("on",y===x)});if(x==="match")newMatch();if(x==="quiz")newQuiz()}
-function flip(){if(!filtered().length)return;showing=!showing;$("front").classList.toggle("hidden",showing);$("back").classList.toggle("hidden",!showing)}
-function next(){const f=filtered();if(f.length){i=(i+1)%f.length;render()}} function prev(){const f=filtered();if(f.length){i=(i-1+f.length)%f.length;render()}}
+function setCat(c){specialMode='';current=c;i=0;render()}
+function render(){
+  renderCats();renderSelects();
+  const f=filtered();
+  $("currentCat").textContent=specialMode==='favorites'?'收藏':specialMode==='wrong'?'错题':current;
+  $("count").textContent=f.length;$("total").textContent=f.length;
+  $("favCount").textContent=favorites.size;$("wrongCount").textContent=wrongs.size;
+  if(i>=f.length)i=0;showing=false;
+  if(f.length){
+    $("idx").textContent=i+1;$("front").textContent=f[i].front;$("back").textContent=f[i].back;
+    $("front").classList.remove("hidden");$("back").classList.add("hidden");
+    const fav=favorites.has(cardKey(f[i]));$("favBtn").textContent=fav?"★ 已收藏":"☆ 收藏";$("favBtn").classList.toggle("on",fav);
+  }else{
+    $("idx").textContent=0;$("front").textContent="这个分类没有词";$("back").textContent="";
+    $("favBtn").textContent="☆ 收藏";$("favBtn").classList.remove("on");
+  }
+  $("randomBtn").textContent=randomMode?"随机学习":"顺序学习";
+  renderList();renderCatManage();renderSearch();renderFavoriteList();renderWrongList();renderStats()
+}
+function tab(x){
+  ["study","search","favorites","wrong","match","quiz","stats","manage"].forEach(y=>{
+    $(y).classList.toggle("hidden",y!==x);
+    $("b"+y[0].toUpperCase()+y.slice(1)).classList.toggle("on",y===x)
+  });
+  if(x==="match")newMatch();
+  if(x==="quiz")newQuiz();
+  if(x==="search")renderSearch();
+  if(x==="favorites")renderFavoriteList();
+  if(x==="wrong")renderWrongList();
+  if(x==="stats")renderStats()
+});if(x==="match")newMatch();if(x==="quiz")newQuiz()}
+function flip(){
+  if(!filtered().length)return;
+  showing=!showing;$("front").classList.toggle("hidden",showing);$("back").classList.toggle("hidden",!showing);
+  if(showing){stats.flips++;bumpToday()}
+}
+function next(){const f=filtered();if(f.length){i=randomMode?Math.floor(Math.random()*f.length):(i+1)%f.length;render()}}
+function prev(){const f=filtered();if(f.length){i=(i-1+f.length)%f.length;render()}}
+function toggleRandom(){randomMode=!randomMode;render();msg(randomMode?"已切换随机学习":"已切换顺序学习")}
+function toggleFavoriteCurrent(){const f=filtered();if(!f.length)return;const k=cardKey(f[i]);favorites.has(k)?favorites.delete(k):favorites.add(k);saveLearningData();render()}
+function markLearned(){stats.learned=(stats.learned||0)+1;bumpToday();msg("已记录为学会");next()}
 
 function normWord(s){
   return String(s||"")
@@ -247,7 +373,11 @@ function clearTwoColumns(){
 function importBulk(){let text=$("bulk").value.trim();if(!text){msg("先粘贴内容");return}let defaultCat=($("bulkCatNew").value.trim()||$("bulkCat").value||"中级词汇");let n=0,skip=0;let seen=new Set(cards.map(c=>normWord(c.front)));text.split(/\n+/).forEach(line=>{line=line.trim();if(!line)return;let p=line.split("|").map(x=>x.trim()).filter(Boolean);let cat,front,back;if(p.length>=3){cat=p[0];front=p[1];back=p[2]}else if(p.length>=2){cat=defaultCat;front=p[0];back=p[1]}else{return}let key=normWord(front);if(seen.has(key)){skip++;return}seen.add(key);cards.push({cat,front,back,base:false});n++});$("bulk").value="";$("bulkCatNew").value="";current=defaultCat;save();msg("已导入 "+n+" 条，跳过重复 "+skip+" 条")}
 function clearCustom(){cards=cards.filter(c=>c.base);current='全部';save();msg("已清空自己添加的词")}
 function resetBase(){const custom=cards.filter(c=>!c.base);cards=[...DEFAULT,...custom];current='全部';save();msg("已恢复内置词库")}
-function factoryReset(){cards=[...DEFAULT];current='全部';save();msg("已全部重置")}
+function factoryReset(){
+  cards=[...DEFAULT];current='全部';specialMode='';favorites.clear();wrongs.clear();
+  stats={date:todayKey(),today:0,flips:0,quizCorrect:0,quizTotal:0,learned:0};
+  saveLearningData();save();msg("词库和学习记录已全部重置")
+}
 function backupText(){return JSON.stringify(cards,null,2)}
 async function copyAllWords(){
   const text=backupText();
@@ -293,12 +423,75 @@ function removeDuplicates(){
   msg("已整理，删除重复 "+removed+" 条");
 }
 
+
+function cardHtml(c,actions=""){
+  return `<div class="item"><div class="a">${esc(c.front)}</div><div class="c">${esc(c.back)}</div><div class="cat">分类：${esc(c.cat)}</div>${actions}</div>`
+}
+function renderSearch(){
+  const box=$("searchResults");if(!box)return;
+  const q=($("searchInput")?.value||"").trim().toLowerCase();
+  const cat=$("searchCat")?.value||"全部";
+  let arr=cards.filter(c=>(cat==="全部"||c.cat===cat)&&(!q||c.front.toLowerCase().includes(q)||c.back.toLowerCase().includes(q)));
+  if(!q){box.innerHTML='<p class="muted">输入阿语或中文开始搜索。</p>';return}
+  box.innerHTML=`<p class="muted">找到 ${arr.length} 条</p>`+arr.slice(0,300).map(c=>cardHtml(c,`<button class="starbtn ${favorites.has(cardKey(c))?'on':''}" onclick="toggleFavoriteByKey('${encodeURIComponent(cardKey(c))}')">${favorites.has(cardKey(c))?'★ 已收藏':'☆ 收藏'}</button>`)).join("");
+}
+function toggleFavoriteByKey(encKey){const k=decodeURIComponent(encKey);favorites.has(k)?favorites.delete(k):favorites.add(k);saveLearningData();render()}
+function renderFavoriteList(){
+  const box=$("favoriteList");if(!box)return;
+  const arr=cards.filter(c=>favorites.has(cardKey(c)));
+  box.innerHTML=arr.length?arr.map(c=>cardHtml(c,`<button class="red" onclick="removeFavorite('${encodeURIComponent(cardKey(c))}')">取消收藏</button>`)).join(""):'<p class="muted">还没有收藏。</p>';
+}
+function removeFavorite(k){favorites.delete(decodeURIComponent(k));saveLearningData();render()}
+function renderWrongList(){
+  const box=$("wrongList");if(!box)return;
+  const arr=cards.filter(c=>wrongs.has(cardKey(c)));
+  box.innerHTML=arr.length?arr.map(c=>cardHtml(c,`<button class="red" onclick="removeWrong('${encodeURIComponent(cardKey(c))}')">移出错题</button>`)).join(""):'<p class="muted">还没有错题。</p>';
+}
+function removeWrong(k){wrongs.delete(decodeURIComponent(k));saveLearningData();render()}
+function clearWrong(){wrongs.clear();saveLearningData();render();msg("错题本已清空")}
+function studyWrong(){specialMode='wrong';current='全部';i=0;tab('study');render()}
+function renderStats(){
+  if(!$("statTotal"))return;
+  $("statTotal").textContent=cards.length;$("statFav").textContent=favorites.size;$("statWrong").textContent=wrongs.size;
+  $("statToday").textContent=stats.today||0;$("statFlips").textContent=stats.flips||0;
+  const rate=stats.quizTotal?Math.round(stats.quizCorrect/stats.quizTotal*100):0;$("statRate").textContent=rate+"%";
+}
+function resetStats(){stats={date:todayKey(),today:0,flips:0,quizCorrect:0,quizTotal:0,learned:0};saveLearningData();render();msg("统计已重置")}
+function downloadTextFile(name,text,type='text/plain;charset=utf-8'){
+  const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)
+}
+function downloadTxt(){
+  const text=cards.map(c=>`【${c.cat}】\n${c.front}\n${c.back}`).join("\n\n");
+  downloadTextFile("埃及方言词库_"+cards.length+"条.txt",text);msg("TXT 已导出")
+}
+function csvCell(v){return '"'+String(v).replace(/"/g,'""')+'"'}
+function downloadCsv(){
+  const rows=[["分类","阿拉伯语","中文"],...cards.map(c=>[c.cat,c.front,c.back])];
+  const csv="\ufeff"+rows.map(r=>r.map(csvCell).join(",")).join("\r\n");
+  downloadTextFile("埃及方言词库_"+cards.length+"条.csv",csv,"text/csv;charset=utf-8");msg("CSV 已导出，可用 Excel 打开")
+}
 function renderList(){const f=filtered(),box=$("list");if(!f.length){box.innerHTML='<div class="item muted">没有词。</div>';return}box.innerHTML=f.map((c,idx)=>`<div class="item"><div class="a">${esc(c.front)}</div><div class="c">${esc(c.back)}</div><div class="cat">分类：${esc(c.cat)}${c.base?' · 内置':' · 自己添加'}</div><button class="red" onclick="delShown(${idx})">删除这一条</button></div>`).join("")}
 function delShown(n){const target=filtered()[n];const pos=cards.indexOf(target);if(pos>=0)cards.splice(pos,1);if(i>=filtered().length)i=0;save()}
 function newMatch(){selected=null;score=0;$("score").textContent=0;let g=$("matchGrid"),f=filtered();if(f.length<2){g.innerHTML='<p class="muted">至少需要2个词。</p>';return}let subset=[...f].sort(()=>Math.random()-.5).slice(0,Math.min(5,f.length));let tiles=[];subset.forEach((c,n)=>{tiles.push({id:n,type:"a",txt:c.front});tiles.push({id:n,type:"c",txt:c.back})});tiles.sort(()=>Math.random()-.5);g.innerHTML=tiles.map(t=>`<div class="tile ${t.type==='a'?'arabic':''}" data-id="${t.id}" data-type="${t.type}" onclick="tap(this)">${esc(t.txt)}</div>`).join("")}
 function tap(el){if(el.classList.contains("done"))return;if(!selected){selected=el;el.classList.add("sel");return}if(selected===el){el.classList.remove("sel");selected=null;return}let ok=selected.dataset.id===el.dataset.id&&selected.dataset.type!==el.dataset.type;if(ok){selected.classList.add("done");el.classList.add("done");selected.classList.remove("sel");score++;$("score").textContent=score}else{el.classList.add("sel");setTimeout(()=>{el.classList.remove("sel");selected&&selected.classList.remove("sel")},300)}selected=null}
 function newQuiz(){const f=filtered();if(f.length<4){$("q").textContent="至少需要4个词";$("opts").innerHTML="";return}let c=f[Math.floor(Math.random()*f.length)];$("q").textContent=c.front;let opts=[c.back];while(opts.length<4){let x=f[Math.floor(Math.random()*f.length)].back;if(!opts.includes(x))opts.push(x)}opts.sort(()=>Math.random()-.5);$("opts").innerHTML=opts.map(o=>`<button class="choice" onclick="ans(this,'${enc(c.back)}')">${esc(o)}</button>`).join("")}
-function ans(btn,correct){qtotal++;let c=decodeURIComponent(correct);if(btn.textContent===c){good++;btn.style.background="#2dd47a";btn.style.color="#05160b"}else{btn.style.background="#b83b54"}$("good").textContent=good;$("qtotal").textContent=qtotal;setTimeout(newQuiz,700)}
+function ans(btn,correct){
+  qtotal++;stats.quizTotal=(stats.quizTotal||0)+1;
+  let c=decodeURIComponent(correct);
+  const currentCard=filtered().find(x=>x.front===$("q").textContent&&x.back===c);
+  if(btn.textContent===c){
+    good++;stats.quizCorrect=(stats.quizCorrect||0)+1;btn.style.background="#2dd47a";btn.style.color="#05160b";
+    if(currentCard)wrongs.delete(cardKey(currentCard));
+  }else{
+    btn.style.background="#b83b54";
+    if(currentCard)wrongs.add(cardKey(currentCard));
+  }
+  bumpToday();saveLearningData();
+  $("good").textContent=good;$("qtotal").textContent=qtotal;
+  $("wrongCount").textContent=wrongs.size;
+  setTimeout(newQuiz,700)
+}else{btn.style.background="#b83b54"}$("good").textContent=good;$("qtotal").textContent=qtotal;setTimeout(newQuiz,700)}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function escAttr(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,"&quot;")}
 function enc(s){return encodeURIComponent(s)}
